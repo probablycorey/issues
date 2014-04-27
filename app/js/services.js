@@ -2,8 +2,25 @@
 
 /* Services */
 
+var notifyService = angular.module('myApp.services', []);
 
-// Demonstrate how to register services
-// In this case it is a simple value service.
-angular.module('myApp.services', []).
-  value('version', '0.1');
+// notifyService.factory('notify', ['$window', function(win) {
+//   var msgs = [];
+//   return function(msg) {
+//     win.alert(msg);
+//   };
+// }]);
+
+notifyService.factory('issues', ['$http', function($http) {
+  return function() {
+    return $http({method: 'GET', url: 'https://api.github.com/repos/atom/find-and-replace/issues'}).
+      catch(function(data, status, headers, config) {
+        console.log(data);
+        console.log(status);
+        throw new Error(data);
+      }).
+      then(function(data, status, headers, config) {
+        return data;
+      });
+  };
+}]);
