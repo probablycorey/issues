@@ -1,2 +1,8 @@
-{{name}}
-{{issues}}
+<div ng-repeat='issue in issues' class='issue'>
+  <div>{{issue.title}}</div>
+  <div>{{issue.body}}</div>
+  <a ngHref='{{issue.comments_url}}'>
+    <ng-pluralize count='issue.comments' when='{0: "no comments", "one":  "one comment", "other": "{} comments"}'
+    </ng-pluralize>
+  </a>
+</div>
