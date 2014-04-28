@@ -5,9 +5,14 @@
 angular.module('myApp', [
   'ngRoute',
   'myApp.services',
-  'myApp.controllers'
+  'myApp.controllers',
+  'cfp.hotkeys'
 ]).
-config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/issues', {templateUrl: 'partials/issues.html', controller: 'IssuesCtrl'});
+config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+  $locationProvider.html5Mode(true);
+  $locationProvider.hashPrefix('!');
+
+  $routeProvider.when('/issues', {templateUrl: 'app/partials/issues.html', controller: 'IssuesCtrl'});
   $routeProvider.otherwise({redirectTo: '/issues'});
+
 }]);

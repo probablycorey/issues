@@ -1,5 +1,5 @@
 <div class="list-group col-md-3">
-  <a ng-repeat='issue in issues' class='list-group-item issue' ng-href='{{issue.html_url}}'>
+  <a ng-repeat='issue in issues' class='list-group-item issue' ng-class='{active: $index==activeIssueIndex}' ng-href='{{issue.html_url}}' name='{{issue.id}}'>
     <h4 class='list-group-item-heading'>{{issue.title}}</h4>
     <div class="row">
       <div class="col-md-12">
