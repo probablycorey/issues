@@ -3,7 +3,7 @@
 /* Controllers */
 
 angular.module('myApp.controllers', [])
-  .controller('IssuesCtrl', ['$scope', '$anchorScroll', 'Issues', 'hotkeys', function($scope, $anchorScroll, Issues, hotkeys) {
+  .controller('IssuesCtrl', ['$scope', '$anchorScroll', 'github', 'hotkeys', function($scope, $anchorScroll, github, hotkeys) {
     $scope.activeIssueIndex = 0;
     $scope.issues = "loading";
     $scope.assigneeImageUrl = function(assignee) {
@@ -13,7 +13,7 @@ angular.module('myApp.controllers', [])
       return assignee ? assignee.html_url : "#";
     };
 
-    Issues().then(function(issues) {
+    github.issues().then(function(issues) {
       $scope.issues = issues;
     });
 
