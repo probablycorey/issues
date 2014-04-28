@@ -1,11 +1,12 @@
-'use strict';
-
-/* Directives */
-
-
-angular.module('myApp.directives', []).
-  directive('appVersion', ['version', function(version) {
-    return function(scope, elm, attrs) {
-      elm.text(version);
-    };
-  }]);
+// 'use strict';
+//
+// /* Directives */
+// angular.directive('myApp.directives', function() {
+//     return {
+//       restrict: 'E',
+//       scope: {
+//         body: '=body'
+//       },
+//       templateUrl: 'my-customer-plus-vojta.html'
+//     };
+//   });

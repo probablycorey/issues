@@ -1,13 +1,22 @@
-<div class="list-group col-lg-3">
-  <div ng-repeat='issue in issues' ng-class='[issue.state]' class='list-group-item'>
+<div class="list-group col-md-3">
+  <div ng-repeat='issue in issues' ng-class='[issue.state]' class='list-group-item issue'>
     <h4 class='list-group-item-heading'>{{issue.title}}</h4>
-    <div ng-repeat='label in issue.labels'>
-      <span class='label' style='background-color:#{{label.color}};'>{{label.name}}</span>
+    <div class="row">
+      <div class="col-md-2">
+        <a class='thumbnail' ng-href='{{assigneeUrl(issue.assignee)}}'>
+          <img ng-src='{{assigneeImageUrl(issue.assignee)}}'></img>
+        </a>
+      </div>
+      <div class="col-md-2">
+        <a ngHref='{{issue.comments_url}}'>
+          <span class="badge">{{issue.comments}}</span>
+        </a>
+      </div>
+      <div class="col-md-8">
+        <div ng-repeat='label in issue.labels'>
+          <span class='label' style='background-color:#{{label.color}};'>{{label.name}}</span>
+        </div>
+      </div>
     </div>
-    <div class='list-group-item-text'>{{issue.body}}</div>
-    <a ngHref='{{issue.comments_url}}'>
-      <ng-pluralize count='issue.comments' when='{"one":  "comment", "other": "comments"}'></ng-pluralize>
-      <span class="badge">{{issue.comments}}</span>
-    </a>
   </div>
 </div>
