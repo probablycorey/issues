@@ -4,14 +4,7 @@
 
 var notifyService = angular.module('myApp.services', []);
 
-// notifyService.factory('notify', ['$window', function(win) {
-//   var msgs = [];
-//   return function(msg) {
-//     win.alert(msg);
-//   };
-// }]);
-
-notifyService.factory('issues', ['$http', function($http) {
+notifyService.factory('Issues', ['$http', function($http) {
   return function() {
     return $http({method: 'GET', url: 'https://api.github.com/repos/atom/find-and-replace/issues'}).
       catch(function(data, status, headers, config) {
@@ -19,7 +12,7 @@ notifyService.factory('issues', ['$http', function($http) {
         throw new Error(data);
       }).
       then(function(data, status, headers, config) {
-        var issues = data.data
+        var issues = data.data;
         return issues;
       });
   };
