@@ -7,7 +7,7 @@ angular.module('myApp.controllers', [])
     $scope.name = 'corey';
     $scope.issues = "loading";
     issues().then(function(data) {
-      console.log(data);
+      console.log(data[0]);
       $scope.issues = data;
     });
   }])

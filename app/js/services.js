@@ -19,7 +19,8 @@ notifyService.factory('issues', ['$http', function($http) {
         throw new Error(data);
       }).
       then(function(data, status, headers, config) {
-        return data.data;
+        var issues = data.data
+        return issues;
       });
   };
 }]);
