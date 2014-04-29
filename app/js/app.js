@@ -10,7 +10,6 @@ angular.module('myApp', [
 ]).
 config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
   $locationProvider.html5Mode(true);
-  $locationProvider.hashPrefix('!');
 
   $routeProvider.when('/issues', {templateUrl: 'app/partials/issues.html', controller: 'IssuesCtrl'});
   $routeProvider.otherwise({redirectTo: '/issues'});
