@@ -1,6 +1,6 @@
 'use strict';
 
-var notifyService = angular.module('myApp.services', []);
+var notifyService = angular.module('issuesApp.services', []);
 
 notifyService.factory('github', ['$http', function($http) {
   return {

@@ -1,7 +1,7 @@
 'use strict';
 
 /* Directives */
-angular.module('myApp.directives', []).
+angular.module('issuesApp.directives', []).
   directive('issue', function() {
     return {
       restrict: 'E',

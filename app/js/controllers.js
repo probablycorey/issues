@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-angular.module('myApp.controllers', [])
+angular.module('issuesApp.controllers', [])
   .factory("IssueService", ["$firebase", function($firebase) {
     var ref = new Firebase("https://glowing-fire-7680.firebaseio.com/issues");
     return $firebase(ref);

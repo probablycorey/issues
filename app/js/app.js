@@ -1,14 +1,14 @@
 'use strict';
 
 // Declare app level module which depends on filters, and services
-angular.module('myApp', [
+angular.module('issuesApp', [
+  'cfp.hotkeys',
+  'firebase',
   'ngRoute',
   'ngAnimate',
-  'myApp.services',
-  'myApp.controllers',
-  'myApp.directives',
-  'cfp.hotkeys',
-  'firebase'
+  'issuesApp.services',
+  'issuesApp.controllers',
+  'issuesApp.directives'
 ]).
 config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
   $locationProvider.html5Mode(true);
