@@ -3,22 +3,17 @@
 /* Controllers */
 
 angular.module('myApp.controllers', [])
-  .controller('IssuesCtrl', ['$scope', '$anchorScroll', '$location', '$document', '$window', 'github', 'hotkeys', function($scope, $anchorScroll, $location, $document, $window, github, hotkeys) {
+  .factory("IssueService", ["$firebase", function($firebase) {
+    var ref = new Firebase("https://glowing-fire-7680.firebaseio.com/issues");
+    return $firebase(ref);
+  }])
+  .controller('IssuesCtrl', ['$scope', '$anchorScroll', '$location', '$document', '$window', 'IssueService', 'github', 'hotkeys', function($scope, $anchorScroll, $location, $document, $window, IssueService, github, hotkeys) {
     $scope.activeIssueIndex = 0;
-    $scope.issues = "loading";
-    $scope.assigneeImageUrl = function(assignee) {
-      return assignee ? assignee.avatar_url : "https://github.global.ssl.fastly.net/images/modules/logos_page/GitHub-Mark.png";
-    };
-    $scope.assigneeUrl = function(assignee) {
-      return assignee ? assignee.html_url : "#";
-    };
-
-    github.issues().then(function(issues) {
-      $scope.issues = issues;
-    });
+    $scope.issues = IssueService;
 
     var getActiveIssue = function() {
-      return $scope.issues[$scope.activeIssueIndex];
+      var id = $scope.issues.$getIndex()[$scope.activeIssueIndex];
+      return $scope.issues[id];
     };
 
     var isElementInViewport = function(element) {
@@ -30,35 +25,56 @@ angular.module('myApp.controllers', [])
     };
 
     var scrollToIssue = function(issue) {
-      var element = $document[0].getElementById("issue-" + issue.id);
+      var element = $document[0].getElementById("issue" + issue.$id);
       if (!isElementInViewport(element)) element.scrollIntoView();
     };
 
     var selectNextIssue = function() {
       $scope.activeIssueIndex++;
-      $scope.activeIssueIndex = $scope.activeIssueIndex % $scope.issues.length;
+      $scope.activeIssueIndex = $scope.activeIssueIndex % $scope.issues.$getIndex().length;
       scrollToIssue(getActiveIssue());
     };
 
     var selectPreviousIssue = function() {
       $scope.activeIssueIndex--;
-      if ($scope.activeIssueIndex < 0) $scope.activeIssueIndex = $scope.issues.length - 1;
+      if ($scope.activeIssueIndex < 0) $scope.activeIssueIndex = $scope.issues.$getIndex().length - 1;
       scrollToIssue(getActiveIssue());
     };
 
     var moveActiveIssueByDelta = function(delta) {
-      var previousIndex = $scope.activeIssueIndex;
-      $scope.activeIssueIndex += delta;
-      if ($scope.activeIssueIndex < 0) {
-        $scope.activeIssueIndex = $scope.issues.length - 1;
+      if ($scope.activeIssueIndex + delta < 0 || $scope.activeIssueIndex + delta >= $scope.issues.$getIndex().length) return;
+
+      var issue = getActiveIssue();
+      var otherIssueId = $scope.issues.$getIndex()[$scope.activeIssueIndex + delta];
+      var otherIssue = $scope.issues[otherIssueId];
+      if (issue.$priority == otherIssue.$priority) {
+        issue.$priority = otherIssue.$priority + 1;
       }
-      else if ($scope.activeIssueIndex >= $scope.issues.length) {
-        $scope.activeIssueIndex = 0;
+      else {
+        var tmp = issue.$priority;
+        issue.$priority = otherIssue.$priority;
+        otherIssue.$priority = tmp;
       }
 
-      $scope.issues.splice($scope.activeIssueIndex, 0, $scope.issues.splice(previousIndex, 1)[0]);
-      scrollToIssue(getActiveIssue());
+      IssueService.$save().then(function() {
+
+      });
+
+      $scope.activeIssueIndex += delta;
     };
+
+    var addIssue = function() {
+      var title = $window.prompt("Create new issue", "cool");
+      if (title) {
+        $scope.issues.$add({title: title});
+      }
+    };
+
+    hotkeys.add({
+      combo: 'a',
+      description: 'Add issue',
+      callback: addIssue
+    });
 
     hotkeys.add({
       combo: 'j',
@@ -83,6 +99,4 @@ angular.module('myApp.controllers', [])
       description: 'Move up',
       callback: function() {moveActiveIssueByDelta(-1);}
     });
-
-
   }]);

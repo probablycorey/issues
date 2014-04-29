@@ -1,0 +1,5 @@
+<div class="list-group col-md-3">
+  <a id='issue{{issue.$id}}' ng-repeat='issue in issues |orderByPriority' class='list-group-item issue' ng-class='{active: $index==activeIssueIndex}'>
+    <h4 class='list-group-item-heading'>{{issue.title}}</h4>
+  </a>
+</div>
