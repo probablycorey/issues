@@ -46,6 +46,20 @@ angular.module('myApp.controllers', [])
       scrollToIssue(getActiveIssue());
     };
 
+    var moveActiveIssueByDelta = function(delta) {
+      var previousIndex = $scope.activeIssueIndex;
+      $scope.activeIssueIndex += delta;
+      if ($scope.activeIssueIndex < 0) {
+        $scope.activeIssueIndex = $scope.issues.length - 1;
+      }
+      else if ($scope.activeIssueIndex >= $scope.issues.length) {
+        $scope.activeIssueIndex = 0;
+      }
+
+      $scope.issues.splice($scope.activeIssueIndex, 0, $scope.issues.splice(previousIndex, 1)[0]);
+      scrollToIssue(getActiveIssue());
+    };
+
     hotkeys.add({
       combo: 'j',
       description: 'Select down',
@@ -53,9 +67,22 @@ angular.module('myApp.controllers', [])
     });
 
     hotkeys.add({
+      combo: 'ctrl+j',
+      description: 'Move down',
+      callback: function() {moveActiveIssueByDelta(1);}
+    });
+
+    hotkeys.add({
       combo: 'k',
       description: 'Select up',
       callback: selectPreviousIssue
     });
+
+    hotkeys.add({
+      combo: 'ctrl+k',
+      description: 'Move up',
+      callback: function() {moveActiveIssueByDelta(-1);}
+    });
+
 
   }]);
