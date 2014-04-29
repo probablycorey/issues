@@ -24,14 +24,16 @@
 </head>
 <body>
   <div class="container-fluid">
-    <div class="row">
+    <p class="row">
       <div class="col">
-        Top
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="filter">
+        </div>
       </div>
-    </div>
-    <div class="row">
-        <div ng-view></div>
-    </div>
+    </p>
+    <p class="row">
+      <div ng-view></div>
+    </p>
   </div>
 </body>
 </html>

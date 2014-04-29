@@ -1,13 +1,12 @@
 'use strict';
 
 /* Directives */
-angular.module('myApp', []).
+angular.module('myApp.directives', []).
   directive('issue', function() {
-    console.log("ok");
     return {
       restrict: 'E',
       scope: {
-        content: '=content'
+        issue: '=content'
       },
       templateUrl: 'app/partials/issue.html'
     };
