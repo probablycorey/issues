@@ -6,6 +6,7 @@ angular.module('myApp', [
   'ngAnimate',
   'myApp.services',
   'myApp.controllers',
+  'myApp.directives',
   'cfp.hotkeys',
   'firebase'
 ]).

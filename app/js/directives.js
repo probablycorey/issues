@@ -1,12 +1,14 @@
-// 'use strict';
-//
-// /* Directives */
-// angular.directive('myApp.directives', function() {
-//     return {
-//       restrict: 'E',
-//       scope: {
-//         body: '=body'
-//       },
-//       templateUrl: 'my-customer-plus-vojta.html'
-//     };
-//   });
+'use strict';
+
+/* Directives */
+angular.module('myApp', []).
+  directive('issue', function() {
+    console.log("ok");
+    return {
+      restrict: 'E',
+      scope: {
+        content: '=content'
+      },
+      templateUrl: 'app/partials/issue.html'
+    };
+  });
