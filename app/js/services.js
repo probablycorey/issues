@@ -20,3 +20,21 @@ angular.module('issuesApp.services', [])
     var ref = new Firebase("https://glowing-fire-7680.firebaseio.com/issues");
     return $firebase(ref);
   }])
+  .factory("ScrollToElementService", ['$window', '$document', function($window, $document) {
+    var isElementInViewport = function(element) {
+      var rect = element.getBoundingClientRect();
+      return rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= $window.innerHeight &&
+        rect.right <= $window.innerWidth;
+    };
+
+    var scrollToElement = function(element) {
+      if (!isElementInViewport(element)) element.scrollIntoView();
+    };
+
+    return function(idString) {
+      var element = $document[0].getElementById(idString);
+      scrollToElement(element);
+    };
+  }]);
