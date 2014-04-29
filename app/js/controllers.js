@@ -3,7 +3,7 @@
 /* Controllers */
 
 angular.module('issuesApp.controllers', [])
-  .controller('IssuesCtrl', ['$scope', '$anchorScroll', '$location', '$document', '$window', 'IssueService', 'GithubService', 'hotkeys', function($scope, $anchorScroll, $location, $document, $window, IssueService, GithubService, hotkeys) {
+  .controller('IssuesCtrl', ['$scope', '$document', '$window', 'IssueService', 'GithubService', 'hotkeys', function($scope, $document, $window, IssueService, GithubService, hotkeys) {
     $scope.activeIssueIndex = 0;
     $scope.issues = IssueService;
 

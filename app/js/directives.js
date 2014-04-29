@@ -2,12 +2,15 @@
 
 /* Directives */
 angular.module('issuesApp.directives', []).
-  directive('issue', function() {
+  directive('issues', function() {
     return {
       restrict: 'E',
       scope: {
-        issue: '=content'
+        issues: '=content'
       },
-      templateUrl: 'app/partials/issue.html'
+      templateUrl: 'app/partials/issues.html',
+      controller: function($scope) {
+        $scope.activeIssueIndex = 0;
+      }
     };
   });
