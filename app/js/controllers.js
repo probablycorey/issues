@@ -3,11 +3,7 @@
 /* Controllers */
 
 angular.module('issuesApp.controllers', [])
-  .factory("IssueService", ["$firebase", function($firebase) {
-    var ref = new Firebase("https://glowing-fire-7680.firebaseio.com/issues");
-    return $firebase(ref);
-  }])
-  .controller('IssuesCtrl', ['$scope', '$anchorScroll', '$location', '$document', '$window', 'IssueService', 'github', 'hotkeys', function($scope, $anchorScroll, $location, $document, $window, IssueService, github, hotkeys) {
+  .controller('IssuesCtrl', ['$scope', '$anchorScroll', '$location', '$document', '$window', 'IssueService', 'GithubService', 'hotkeys', function($scope, $anchorScroll, $location, $document, $window, IssueService, GithubService, hotkeys) {
     $scope.activeIssueIndex = 0;
     $scope.issues = IssueService;
 
