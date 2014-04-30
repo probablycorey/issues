@@ -7,6 +7,7 @@ angular.module('issuesApp.directives', []).
       restrict: 'E',
       scope: {
         issues: '=issues',
+        filter: '=filter',
         activeIssueId: '=activeIssueId'
       },
       templateUrl: 'app/partials/issues.html'

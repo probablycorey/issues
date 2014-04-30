@@ -8,22 +8,10 @@
   width: 10%;
 }
 
-/*.issue.ng-move {
-
-  -webkit-animation:view_enter 1s;
-}
-
-@-webkit-keyframes view_enter {
-  0% { opacity:1; }
-  50% { opacity:0.5; }
-  75% { opacity:0.9; }
-  100% { opacity:1; }
-}*/
-
 .issue.ng-move {
   -webkit-transition:0.2s linear all;
   opacity:0.5;
-  -webkit-transform:scale(0.95);
+  -webkit-transform:scale(0.5);
 }
 
 .issue.ng-move.ng-move-active {

@@ -8,6 +8,12 @@ angular.module('issuesApp.controllers', [])
     $scope.currentIssues = IssueService("current");
     $scope.backlogIssues = IssueService("backlog");
     $scope.iceboxIssues = IssueService("icebox");
+    $scope.keydown = function(event) {
+      var escapeKey = 27;
+      if (event.keyCode == escapeKey) {
+        $window.window.document.activeElement.blur();
+      }
+    };
 
     $scope.currentIssues.$on("loaded", function() {
       $scope.activeIssueId = $scope.currentIssues.$getIndex()[0];
