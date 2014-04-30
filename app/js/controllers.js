@@ -119,17 +119,4 @@ angular.module('issuesApp.controllers', [])
       description: 'Move right',
       callback: function() {switchIssueList(1);}
     });
-
-    var addIssue = function() {
-      var title = $window.prompt("Create new issue", "cool");
-        if (title) {
-        activeIssues.$add({title: title});
-      }
-    };
-
-    hotkeys.add({
-      combo: 'a',
-      description: 'Add issue',
-      callback: addIssue
-    });
 });
