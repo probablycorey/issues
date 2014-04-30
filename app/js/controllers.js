@@ -3,17 +3,46 @@
 /* Controllers */
 
 angular.module('issuesApp.controllers', [])
-  .controller('IssuesCtrl', function($scope, $window, IssueService, ScrollToElementService, hotkeys) {
+  .controller('IssuesCtrl', function($scope, $window, $q, GithubService, IssueService, ScrollToElementService, hotkeys) {
     $scope.activeIssueId = null;
     $scope.currentIssues = IssueService("current");
     $scope.backlogIssues = IssueService("backlog");
     $scope.iceboxIssues = IssueService("icebox");
-
-    $scope.currentIssues.$on("loaded", function() {
-      $scope.activeIssueId = $scope.currentIssues.$getIndex()[0];
-    });
+    $scope.githubIssues = null;
 
     var activeIssues = $scope.currentIssues;
+
+    var loadingDefer = $q.defer();
+    var loadingCount = 0;
+    var loaded = function() {
+      if (++loadingCount == 4) loadingDefer.resolve();
+    };
+
+    $scope.currentIssues.$on("loaded", loaded);
+    $scope.backlogIssues.$on("loaded", loaded);
+    $scope.iceboxIssues.$on("loaded", loaded);
+    GithubService.issues().then(function(issues) {
+      $scope.githubIssues = issues;
+      loaded();
+    });
+
+    loadingDefer.promise.then(function() {
+      activeIssues = $scope.iceboxIssues;
+      $scope.activeIssueId = activeIssues.$getIndex()[0];
+      $scope.githubIssues.forEach(function(issue) {
+        var card = $scope.currentIssues[issue.id] || $scope.backlogIssues[issue.id] || $scope.iceboxIssues[issue.id];
+        if (!card) {
+          card = $scope.iceboxIssues.$child(issue.id);
+        }
+        else {
+          angular.forEach(issue, function(value, key) {card[key] = value;});
+        }
+      });
+
+      $scope.currentIssues.$save();
+      $scope.backlogIssues.$save();
+      $scope.iceboxIssues.$save();
+    });
 
     var getActiveIssue = function() {
       return activeIssues[$scope.activeIssueId];
