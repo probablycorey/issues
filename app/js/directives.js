@@ -10,7 +10,12 @@ angular.module('issuesApp.directives', [])
         filter: '=filter',
         activeIssueId: '=activeIssueId'
       },
-      templateUrl: 'app/partials/issues.html'
+      templateUrl: 'app/partials/issues.html',
+      controller: function($scope) {
+        $scope.assigneeImageUrl = function(assignee) {
+          return assignee ? assignee.avatar_url : "https://github.global.ssl.fastly.net/images/modules/logos_page/GitHub-Mark.png";
+        };
+      }
     };
   })
   .directive('escapable', function() {
