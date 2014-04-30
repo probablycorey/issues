@@ -9,7 +9,7 @@ angular.module('issuesApp.directives', []).
         issues: '=content'
       },
       templateUrl: 'app/partials/issues.html',
-      controller: function($scope, IssueService, ScrollToElementService, hotkeys) {
+      controller: function($scope, $window, IssueService, ScrollToElementService, hotkeys) {
         $scope.activeIssueId = null;
 
         var getActiveIssue = function() {
@@ -37,7 +37,7 @@ angular.module('issuesApp.directives', []).
           issue.$priority = otherIssue.$priority;
           otherIssue.$priority = tmp;
 
-          IssueService.$save()
+          IssueService.$save();
         };
 
         hotkeys.add({
@@ -62,6 +62,19 @@ angular.module('issuesApp.directives', []).
           combo: 'ctrl+k',
           description: 'Move up',
           callback: function() {moveActiveIssueByDelta(-1);}
+        });
+
+        var addIssue = function() {
+          var title = $window.prompt("Create new issue", "cool");
+          if (title) {
+            $scope.issues.$add({title: title});
+          }
+        };
+
+        hotkeys.add({
+          combo: 'a',
+          description: 'Add issue',
+          callback: addIssue
         });
       }
     };

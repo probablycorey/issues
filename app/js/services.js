@@ -17,8 +17,15 @@ angular.module('issuesApp.services', [])
     };
   }])
   .factory("IssueService", ["$firebase", function($firebase) {
-    var ref = new Firebase("https://glowing-fire-7680.firebaseio.com/issues");
-    return $firebase(ref);
+    var firebases = {};
+
+    return function(name) {
+      if (firebases[name]) return firebases[name];
+
+      var ref = new Firebase("https://glowing-fire-7680.firebaseio.com/" + name);
+      firebases[name] = $firebase(ref);
+      return firebases[name];
+    };
   }])
   .factory("ScrollToElementService", ['$window', '$document', function($window, $document) {
     var isElementInViewport = function(element) {
