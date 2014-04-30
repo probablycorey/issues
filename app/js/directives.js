@@ -10,22 +10,20 @@ angular.module('issuesApp.directives', []).
       },
       templateUrl: 'app/partials/issues.html',
       controller: function($scope, IssueService, ScrollToElementService, hotkeys) {
-        $scope.activeIssueIndex = 0;
+        $scope.activeIssueId = null;
 
         var getActiveIssue = function() {
-          var id = $scope.issues.$getIndex()[$scope.activeIssueIndex];
-          return $scope.issues[id];
+          return $scope.issues[$scope.activeIssueId];
         };
 
-        var selectNextIssue = function() {
-          $scope.activeIssueIndex++;
-          $scope.activeIssueIndex = $scope.activeIssueIndex % $scope.issues.$getIndex().length;
-          ScrollToElementService("issue" + getActiveIssue().$id);
-        };
+        var selectIssueByDelta = function(delta) {
+          var ids = $scope.issues.$getIndex();
+          var index = ids.indexOf($scope.activeIssueId) + delta;
 
-        var selectPreviousIssue = function() {
-          $scope.activeIssueIndex--;
-          if ($scope.activeIssueIndex < 0) $scope.activeIssueIndex = $scope.issues.$getIndex().length - 1;
+          if (index >= ids.length) $scope.activeIssueId = $scope.issues.$getIndex()[0];
+          else if (index < 0) $scope.activeIssueId = ids[ids.length - 1];
+          else $scope.activeIssueId = ids[index];
+
           ScrollToElementService("issue" + getActiveIssue().$id);
         };
 
@@ -35,26 +33,17 @@ angular.module('issuesApp.directives', []).
           var issue = getActiveIssue();
           var otherIssueId = $scope.issues.$getIndex()[$scope.activeIssueIndex + delta];
           var otherIssue = $scope.issues[otherIssueId];
-          if (issue.$priority == otherIssue.$priority) {
-            issue.$priority = otherIssue.$priority + 1;
-          }
-          else {
-            var tmp = issue.$priority;
-            issue.$priority = otherIssue.$priority;
-            otherIssue.$priority = tmp;
-          }
+          var tmp = issue.$priority;
+          issue.$priority = otherIssue.$priority;
+          otherIssue.$priority = tmp;
 
-          IssueService.$save().then(function() {
-
-          });
-
-          $scope.activeIssueIndex += delta;
+          IssueService.$save()
         };
 
         hotkeys.add({
           combo: 'j',
           description: 'Select down',
-          callback: selectNextIssue
+          callback: function() {selectIssueByDelta(1);}
         });
 
         hotkeys.add({
@@ -66,7 +55,7 @@ angular.module('issuesApp.directives', []).
         hotkeys.add({
           combo: 'k',
           description: 'Select up',
-          callback: selectPreviousIssue
+          callback: function() {selectIssueByDelta(-1);}
         });
 
         hotkeys.add({
