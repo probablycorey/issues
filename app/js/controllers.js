@@ -8,6 +8,7 @@ angular.module('issuesApp.controllers', [])
     $scope.currentIssues = IssueService("current");
     $scope.backlogIssues = IssueService("backlog");
     $scope.iceboxIssues = IssueService("icebox");
+
     $scope.currentIssues.$on("loaded", function() {
       $scope.activeIssueId = $scope.currentIssues.$getIndex()[0];
     });
@@ -30,16 +31,17 @@ angular.module('issuesApp.controllers', [])
     };
 
     var moveActiveIssueByDelta = function(delta) {
-      if ($scope.activeIssueIndex + delta < 0 || $scope.activeIssueIndex + delta >= activeIssues.$getIndex().length) return;
+      var activeIssueIndex = activeIssues.$getIndex().indexOf($scope.activeIssueId);
+      if (activeIssueIndex + delta < 0 || activeIssueIndex + delta >= activeIssues.$getIndex().length) return;
 
       var issue = getActiveIssue();
-      var otherIssueId = activeIssues.$getIndex()[$scope.activeIssueIndex + delta];
+      var otherIssueId = activeIssues.$getIndex()[activeIssueIndex + delta];
       var otherIssue = activeIssues[otherIssueId];
       var tmp = issue.$priority;
       issue.$priority = otherIssue.$priority;
       otherIssue.$priority = tmp;
 
-      IssueService.$save();
+      activeIssues.$save();
     };
 
     var switchIssueList = function(delta) {
