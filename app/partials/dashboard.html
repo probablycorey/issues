@@ -1,7 +1,14 @@
 <div class="list-group col-md-3">
+  <h3>Current <span class="label label-default">{{currentIssues.$getIndex().length}}</span></h3>
   <issues issues='currentIssues' active-issue-id='activeIssueId'></issues>
 </div>
 
 <div class="list-group col-md-3">
-  <issues issues='nextIssues' active-issue-id='activeIssueId'></issues>
+  <h3>Backlog <span class="label label-default">{{backlogIssues.$getIndex().length}}</span></h3>
+  <issues issues='backlogIssues' active-issue-id='activeIssueId'></issues>
+</div>
+
+<div class="list-group col-md-3">
+  <h3>Icebox <span class="label label-default">{{iceboxIssues.$getIndex().length}}</span></h3>
+  <issues issues='iceboxIssues' active-issue-id='activeIssueId'></issues>
 </div>

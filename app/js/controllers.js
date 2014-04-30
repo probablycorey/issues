@@ -6,7 +6,8 @@ angular.module('issuesApp.controllers', [])
   .controller('IssuesCtrl', function($scope, $window, IssueService, ScrollToElementService, hotkeys) {
     $scope.activeIssueId = null;
     $scope.currentIssues = IssueService("current");
-    $scope.nextIssues = IssueService("next");
+    $scope.backlogIssues = IssueService("backlog");
+    $scope.iceboxIssues = IssueService("icebox");
     $scope.currentIssues.$on("loaded", function() {
       $scope.activeIssueId = $scope.currentIssues.$getIndex()[0];
     });
@@ -41,6 +42,17 @@ angular.module('issuesApp.controllers', [])
       IssueService.$save();
     };
 
+    var switchIssueList = function(delta) {
+      var lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
+      var index = lists.indexOf(activeIssues);
+      index += delta;
+      if (index < 0) index = lists.length - 1;
+      else if (index >= lists.length) index = 0;
+
+      activeIssues = lists[index];
+      $scope.activeIssueId = activeIssues.$getIndex()[0];
+    };
+
     hotkeys.add({
       combo: 'j',
       description: 'Select down',
@@ -64,4 +76,29 @@ angular.module('issuesApp.controllers', [])
       description: 'Move up',
       callback: function() {moveActiveIssueByDelta(-1);}
     });
-  });
+
+    hotkeys.add({
+      combo: 'h',
+      description: 'Move left',
+      callback: function() {switchIssueList(-1);}
+    });
+
+    hotkeys.add({
+      combo: 'l',
+      description: 'Move right',
+      callback: function() {switchIssueList(1);}
+    });
+
+    var addIssue = function() {
+      var title = $window.prompt("Create new issue", "cool");
+        if (title) {
+        activeIssues.$add({title: title});
+      }
+    };
+
+    hotkeys.add({
+      combo: 'a',
+      description: 'Add issue',
+      callback: addIssue
+    });
+});
