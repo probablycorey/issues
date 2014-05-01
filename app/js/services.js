@@ -22,7 +22,7 @@ angular.module('issuesApp.services', [])
     return function(name) {
       if (firebases[name]) return firebases[name];
 
-      var ref = new Firebase("https://glowing-fire-7680.firebaseio.com/" + name);
+      var ref = new Firebase("https://corey.firebaseio.com/" + name);
       firebases[name] = $firebase(ref);
       return firebases[name];
     };
