@@ -5,9 +5,9 @@
 angular.module('issuesApp.controllers', [])
   .controller('IssuesCtrl', function($scope, $window, $q, $firebase, GithubService, IssueService, ScrollToElementService, hotkeys) {
     $scope.activeIssueId = null;
-    $scope.currentIssues = IssueService("current");
-    $scope.iceboxIssues = IssueService("icebox");
-    $scope.backlogIssues = IssueService("backlog");
+    $scope.currentIssues = IssueService.getList("current");
+    $scope.iceboxIssues = IssueService.getList("icebox");
+    $scope.backlogIssues = IssueService.getList("backlog");
     $scope.githubIssues = null;
 
     var activeIssues = $scope.currentIssues;

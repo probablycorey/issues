@@ -17,14 +17,12 @@ angular.module('issuesApp.services', [])
     };
   }])
   .factory("IssueService", ["$firebase", function($firebase) {
-    var firebases = {};
+    var firebase = $firebase(new Firebase("https://corey.firebaseio.com/"));
 
-    return function(name) {
-      if (firebases[name]) return firebases[name];
-
-      var ref = new Firebase("https://corey.firebaseio.com/" + name);
-      firebases[name] = $firebase(ref);
-      return firebases[name];
+    return {
+      getList: function(name) {
+        return firebase.$child(name);
+      }
     };
   }])
   .factory("ScrollToElementService", ['$window', '$document', function($window, $document) {
