@@ -69,7 +69,7 @@ angular.module('issuesApp.controllers', [])
       var otherIssueId = activeIssues.$getIndex()[activeIssueIndex + delta];
       var otherIssue = activeIssues[otherIssueId];
       var tmp = issue.$priority;
-      issue.$priority = otherIssue.$priority;
+      issue.$priority = otherIssue.$priority - 1;
       otherIssue.$priority = tmp;
 
       activeIssues.$save();
@@ -92,17 +92,15 @@ angular.module('issuesApp.controllers', [])
       if (newIndex < 0 || newIndex >= lists.length) return;
 
       var issue = getActiveIssue();
+      activeIssues.$remove($scope.activeIssueId);
+
       activeIssues = lists[newIndex];
       var topCard = activeIssues[activeIssues.$getIndex()[0]];
       var lowestPriority = topCard ? topCard.$priority : 0;
-      var card = activeIssues.$child("fart");
+      var card = activeIssues.$child(issue.id);
+      angular.extend(card, issue);
       card.$priority = lowestPriority;
-      card.id = "wow";
-      card.title = "cool";
-      // angular.extend(card, issue);
-      console.log(card, activeIssues);
-      activeIssues.$save();
-      // activeIssues.$remove($scope.activeIssueId);
+      card.$save();
     };
 
     hotkeys.add({
