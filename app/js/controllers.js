@@ -53,11 +53,7 @@ angular.module('issuesApp.controllers', [])
     var selectIssueByDelta = function(delta) {
       var ids = activeIssues.$getIndex();
       var index = ids.indexOf($scope.activeIssueId) + delta;
-
-      if (index >= ids.length) $scope.activeIssueId = activeIssues.$getIndex()[0];
-      else if (index < 0) $scope.activeIssueId = ids[ids.length - 1];
-      else $scope.activeIssueId = ids[index];
-
+      if (index >= ids.length || index < 0) return;
       ScrollToElementService("issue" + getActiveIssue().$id);
     };
 
@@ -75,17 +71,19 @@ angular.module('issuesApp.controllers', [])
       activeIssues.$save();
     };
 
-    var switchIssueList = function(delta) {
+    var selectListByDelta = function(delta) {
       var lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
       var index = lists.indexOf(activeIssues);
-      index += delta;
-      if (index < 0 || index >= lists.length) return;
+      do {
+        index += delta;
+        if (index < 0 || index >= lists.length) return;
+      } while(lists[index].$getIndex().length === 0);
 
       activeIssues = lists[index];
       $scope.activeIssueId = activeIssues.$getIndex()[0];
     };
 
-    var moveCard = function(delta) {
+    var moveCardByDelta = function(delta) {
       var lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
       var currentIndex = lists.indexOf(activeIssues);
       var newIndex = currentIndex + delta;
@@ -130,24 +128,24 @@ angular.module('issuesApp.controllers', [])
     hotkeys.add({
       combo: 'h',
       description: 'Move left',
-      callback: function() {switchIssueList(-1);}
+      callback: function() {selectListByDelta(-1);}
     });
 
     hotkeys.add({
       combo: 'ctrl+h',
       description: 'Move card left',
-      callback: function() {moveCard(-1);}
+      callback: function() {moveCardByDelta(-1);}
     });
 
     hotkeys.add({
       combo: 'l',
       description: 'Move right',
-      callback: function() {switchIssueList(1);}
+      callback: function() {selectListByDelta(1);}
     });
 
     hotkeys.add({
       combo: 'ctrl+l',
       description: 'Move card right',
-      callback: function() {moveCard(1);}
+      callback: function() {moveCardByDelta(1);}
     });
 });
