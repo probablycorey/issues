@@ -31,23 +31,16 @@ angular.module('issuesApp.controllers', [])
       $scope.activeIssueId = activeIssues.$getIndex()[0];
 
       $scope.githubIssues.forEach(function(issue) {
-        var card = $scope.currentIssues[issue.id] || $scope.backlogIssues[issue.id] || $scope.iceboxIssues[issue.id];
+        var card = $scope.currentIssues.$child(issue.id) || $scope.backlogIssues.$child(issue.id) || $scope.iceboxIssues.$child(issue.id);
         if (!card) {
           card = $scope.iceboxIssues.$child(issue.id);
-          card.$update(issue);
         }
-        else {
-          angular.forEach(issue, function(value, key) {card[key] = value;});
-        }
+        card.$update(issue);
       });
-
-      $scope.currentIssues.$save();
-      $scope.backlogIssues.$save();
-      $scope.iceboxIssues.$save();
     });
 
     var getActiveIssue = function() {
-      return activeIssues[$scope.activeIssueId];
+      return activeIssues.$child($scope.activeIssueId);
     };
 
     var selectIssueByDelta = function(delta) {
@@ -64,12 +57,10 @@ angular.module('issuesApp.controllers', [])
 
       var issue = getActiveIssue();
       var otherIssueId = activeIssues.$getIndex()[activeIssueIndex + delta];
-      var otherIssue = activeIssues[otherIssueId];
+      var otherIssue = activeIssues.$child(otherIssueId);
       var tmp = issue.$priority;
-      issue.$priority = otherIssue.$priority - 1;
-      otherIssue.$priority = tmp;
-
-      activeIssues.$save();
+      issue.$update({priority: otherIssue.$priority - 1});
+      otherIssue.$update({priority: tmp});
     };
 
     var selectListByDelta = function(delta) {
@@ -94,8 +85,8 @@ angular.module('issuesApp.controllers', [])
       activeIssues.$remove($scope.activeIssueId);
 
       activeIssues = lists[newIndex];
-      var topCard = activeIssues[activeIssues.$getIndex()[0]];
-      var lowestPriority = topCard ? topCard.$priority : 0;
+      var topCard = activeIssues.$child(activeIssues.$getIndex()[0]);
+      var lowestPriority = topCard.$priority || 0;
       var card = activeIssues.$child(issue.id);
       angular.extend(card, issue);
       card.$priority = lowestPriority;
