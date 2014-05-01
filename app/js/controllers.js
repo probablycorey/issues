@@ -11,6 +11,7 @@ angular.module('issuesApp.controllers', [])
     $scope.githubIssues = null;
 
     var activeIssues = $scope.currentIssues;
+    var lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
 
     var loadingDefer = $q.defer();
     var loadingCount = 0;
@@ -27,17 +28,39 @@ angular.module('issuesApp.controllers', [])
     });
 
     loadingDefer.promise.then(function() {
-      activeIssues = $scope.iceboxIssues;
-      $scope.activeIssueId = activeIssues.$getIndex()[0];
+      setActiveIssues();
 
       $scope.githubIssues.forEach(function(issue) {
-        var card = $scope.currentIssues.$child(issue.id) || $scope.backlogIssues.$child(issue.id) || $scope.iceboxIssues.$child(issue.id);
+        var card = null;
+        lists.forEach(function(list) {
+          if (list[issue.id]) {
+            card = list.$child(issue.id);
+            return;
+          }
+        });
+
         if (!card) {
           card = $scope.iceboxIssues.$child(issue.id);
         }
         card.$update(issue);
       });
+
+      setActiveIssues();
     });
+
+    var setActiveIssues = function() {
+      if ($scope.currentIssues.$getIndex().length) {
+        activeIssues = $scope.currentIssues;
+      }
+      else if ($scope.backlogIssues.$getIndex().length) {
+        activeIssues = $scope.backlogIssues;
+      }
+      else {
+        activeIssues = $scope.iceboxIssues;
+      }
+
+      $scope.activeIssueId = activeIssues.$getIndex()[0];
+    };
 
     var getActiveIssue = function() {
       return activeIssues.$child($scope.activeIssueId);
@@ -76,21 +99,22 @@ angular.module('issuesApp.controllers', [])
     };
 
     var moveCardByDelta = function(delta) {
-      var lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
       var currentIndex = lists.indexOf(activeIssues);
       var newIndex = currentIndex + delta;
       if (newIndex < 0 || newIndex >= lists.length) return;
 
       var issue = getActiveIssue();
-      activeIssues.$remove($scope.activeIssueId);
 
       activeIssues = lists[newIndex];
-      var topCard = activeIssues.$child(activeIssues.$getIndex()[0]);
-      var lowestPriority = topCard.$priority || 0;
+      var lowestPriority = 0;
+      if (activeIssues.$getIndex().length) {
+        lowestPriority = activeIssues.$child(activeIssues.$getIndex()[0]).$priority;
+      }
+
       var card = activeIssues.$child(issue.id);
-      angular.extend(card, issue);
       card.$priority = lowestPriority;
-      card.$save();
+      card.$update(issue);
+      issue.$remove();
     };
 
     hotkeys.add({
