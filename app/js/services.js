@@ -22,9 +22,11 @@ angular.module('issuesApp.services', [])
     return function(name) {
       if (firebases[name]) return firebases[name];
 
+      name = "corey";
       var ref = new Firebase("https://glowing-fire-7680.firebaseio.com/" + name);
-      firebases[name] = $firebase(ref);
-      return firebases[name];
+      return $firebase(ref);
+      // firebases[name] = $firebase(ref);
+      // return firebases[name];
     };
   }])
   .factory("ScrollToElementService", ['$window', '$document', function($window, $document) {
