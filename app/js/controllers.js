@@ -106,7 +106,7 @@ angular.module('issuesApp.controllers', [])
     hotkeys.add({
       combo: 'j',
       description: 'Select down',
-      callback: function() {selectIssueByDelta(1); return true;}
+      callback: function() {selectIssueByDelta(1);}
     });
 
     hotkeys.add({
