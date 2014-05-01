@@ -54,6 +54,7 @@ angular.module('issuesApp.controllers', [])
       var ids = activeIssues.$getIndex();
       var index = ids.indexOf($scope.activeIssueId) + delta;
       if (index >= ids.length || index < 0) return;
+      $scope.activeIssueId = ids[index];
       ScrollToElementService("issue" + getActiveIssue().$id);
     };
 
