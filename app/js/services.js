@@ -41,4 +41,7 @@ angular.module('issuesApp.services', [])
       var element = $document[0].getElementById(idString);
       scrollToElement(element);
     };
-  }]);
+  }])
+  .factory("_", function($window) {
+    return $window._;
+  });

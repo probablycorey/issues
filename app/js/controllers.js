@@ -3,19 +3,18 @@
 /* Controllers */
 
 angular.module('issuesApp.controllers', [])
-  .controller('IssuesCtrl', function($scope, $window, $q, FirebaseService, GithubService, ScrollToElementService, hotkeys) {
+  .controller('IssuesCtrl', function($scope, $window, $q, _, FirebaseService, GithubService, ScrollToElementService, hotkeys) {
     var updateIssues = function (repos, keys) {
       keys = keys ? keys : repos.$getIndex();
       if (keys.length === 0) return;
 
       var repo = repos.$child(keys.pop());
       var elapsedMinutes = (Date.now() - repo.lastUpdated) / 1000 / 60;
-      repo.$update({lastUpdated: Date.now()});
 
       if (elapsedMinutes > 10) {
-        console.log("Updating: " + repo.name);
+        repo.$update({lastUpdated: Date.now()});
         GithubService.issuesForRepo(repo.name).then(function(issues) {
-            refreshIssues(issues);
+            refreshIssues(issues, repo.name);
             updateIssues(repos, keys);
         });
       }
@@ -24,21 +23,32 @@ angular.module('issuesApp.controllers', [])
       }
     };
 
-    var refreshIssues = function(issues) {
-      issues.forEach(function(issue) {
-        var card = null;
-        lists.forEach(function(list) {
-          if (list[issue.id]) {
-            card = list.$child(issue.id);
-            return;
+    var repoNameFromUrl = function(url) {
+      return url.match(/repos\/(.*?)\/issues/)[1];
+    };
+
+    var refreshIssues = function(issues, repoName) {
+      // Get all existing cards for repo
+      var cards = [];
+      var closedCards = [];
+      lists.forEach(function(list) {
+        list.$getIndex().forEach(function(id) {
+          var card = list.$child(id);
+          if (repoNameFromUrl(card.url) == repoName) cards.push(card);
+          if (!_.find(issues, function(issue) {return issue.id == card.id;})) {
+            closedCards.push(card);
           }
         });
+      });
 
-        if (!card) {
-          card = $scope.iceboxIssues.$child(issue.id);
-        }
+      // Update or create existing cards
+      issues.forEach(function(issue) {
+        var card = _.find(cards, function(card) {return card.id == issue.id;});
+        if (!card) card = $scope.iceboxIssues.$child(issue.id);
         card.$update(issue);
       });
+
+      console.log("Closed cards", closedCards);
 
       if (!$scope.activeIssueId) setActiveIssues();
     };
@@ -170,6 +180,7 @@ angular.module('issuesApp.controllers', [])
       $scope.iceboxIssues = firebase.$child("icebox");
       $scope.backlogIssues = firebase.$child("backlog");
       lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
+
       setActiveIssues();
       updateIssues(firebase.$child('repos'));
     });
