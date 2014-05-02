@@ -5,19 +5,10 @@
     </div>
   </div>
 </p>
+
 <p class="row">
-  <div class="list-group col-md-3">
-    <h3>Current <span class="label label-default">{{currentIssues.$getIndex().length}}</span></h3>
-    <issues issues='currentIssues' filter='filter' active-issue-id='activeIssueId'></issues>
-  </div>
-
-  <div class="list-group col-md-3">
-    <h3>Backlog <span class="label label-default">{{backlogIssues.$getIndex().length}}</span></h3>
-    <issues issues='backlogIssues' filter='filter' active-issue-id='activeIssueId'></issues>
-  </div>
-
-  <div class="list-group col-md-3">
-    <h3>Icebox <span class="label label-default">{{iceboxIssues.$getIndex().length}}</span></h3>
-    <issues issues='iceboxIssues' filter='filter' active-issue-id='activeIssueId'></issues>
+  <div ng-repeat="list in lists" class="list-group col-md-3">
+    <h3>{{list.$id}} <span class="label label-default">{{list.$getIndex().length}}</span></h3>
+    <issues issues='list' filter='filter' active-card='activeCard'></issues>
   </div>
 </p>

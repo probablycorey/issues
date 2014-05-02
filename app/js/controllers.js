@@ -49,77 +49,79 @@ angular.module('issuesApp.controllers', [])
       });
 
       console.log("Closed cards", closedCards);
-
-      if (!$scope.activeIssueId) setActiveIssues();
     };
 
-    var setActiveIssues = function() {
-      if ($scope.currentIssues.$getIndex().length) {
-        activeIssues = $scope.currentIssues;
-      }
-      else if ($scope.backlogIssues.$getIndex().length) {
-        activeIssues = $scope.backlogIssues;
-      }
-      else {
-        activeIssues = $scope.iceboxIssues;
+    var setActiveList = function(list) {
+      if (!list) list = _.find(lists, function(list) {return list.$getIndex().length;});
+      activeList = list;
+      var card = activeCardsByList[list.id];
+      var ids = list.$getIndex();
+      if (!card || ids.indexOf(card.id) == -1) {
+        card = list.$child(ids[0]);
       }
 
-      $scope.activeIssueId = activeIssues.$getIndex()[0];
+      setActiveCard(card);
     };
 
-    var getActiveIssue = function() {
-      return activeIssues.$child($scope.activeIssueId);
+    var getActiveCard = function() {
+      return activeCardsByList[activeList.id];
+    };
+
+    var setActiveCard = function(card) {
+      activeCardsByList[activeList.id] = card;
+      $scope.activeCard = card;
     };
 
     var selectIssueByDelta = function(delta) {
-      var ids = activeIssues.$getIndex();
-      var index = ids.indexOf($scope.activeIssueId) + delta;
+      var ids = activeList.$getIndex();
+      var index = ids.indexOf(getActiveCard().id) + delta;
       if (index >= ids.length || index < 0) return;
-      $scope.activeIssueId = ids[index];
-      ScrollToElementService("issue" + getActiveIssue().$id);
+
+      var card = activeList.$child(ids[index]);
+      setActiveCard(card);
+      ScrollToElementService("issue" + card.$id);
     };
 
     var moveActiveIssueByDelta = function(delta) {
-      var activeIssueIndex = activeIssues.$getIndex().indexOf($scope.activeIssueId);
-      if (activeIssueIndex + delta < 0 || activeIssueIndex + delta >= activeIssues.$getIndex().length) return;
+      var ids = activeList.$getIndex();
+      var newIndex = ids.indexOf(getActiveCard().id) + delta;
+      if (newIndex >= ids.length || newIndex < 0) return;
 
-      var issue = getActiveIssue();
-      var otherIssueId = activeIssues.$getIndex()[activeIssueIndex + delta];
-      var otherIssue = activeIssues.$child(otherIssueId);
-      var tmp = issue.$priority;
-      issue.$update({priority: otherIssue.$priority - 1});
-      otherIssue.$update({priority: tmp});
+      var activeCard = getActiveCard();
+      var otherCard = activeList.$child(ids[newIndex]);
+      var tmp = activeCard.$priority;
+      activeCard.$update({priority: otherCard.$priority});
+      otherCard.$update({priority: tmp});
+    };
+
+    var listByDelta = function(delta, excludeEmpty) {
+      var index = lists.indexOf(activeList);
+      do {
+        index += delta;
+        if (index < 0 || index >= lists.length) return activeList;
+      } while(excludeEmpty && lists[index].$getIndex().length === 0);
+
+      return lists[index];
     };
 
     var selectListByDelta = function(delta) {
-      var lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
-      var index = lists.indexOf(activeIssues);
-      do {
-        index += delta;
-        if (index < 0 || index >= lists.length) return;
-      } while(lists[index].$getIndex().length === 0);
-
-      activeIssues = lists[index];
-      $scope.activeIssueId = activeIssues.$getIndex()[0];
+      var list = listByDelta(delta, true);
+      setActiveList(lists);
     };
 
-    var moveCardByDelta = function(delta) {
-      var currentIndex = lists.indexOf(activeIssues);
-      var newIndex = currentIndex + delta;
-      if (newIndex < 0 || newIndex >= lists.length) return;
-
-      var issue = getActiveIssue();
-
-      activeIssues = lists[newIndex];
-      var lowestPriority = 0;
-      if (activeIssues.$getIndex().length) {
-        lowestPriority = activeIssues.$child(activeIssues.$getIndex()[0]).$priority;
+    var moveCardToList = function(card, list) {
+      var priority = 0;
+      var topCardId = list.$getIndex()[0];
+      if (topCardId) {
+        priority = list.$child(topCardId).$priority;
       }
 
-      var card = activeIssues.$child(issue.id);
-      card.$priority = lowestPriority;
-      card.$update(issue);
-      issue.$remove();
+      var newCard = list.$child(card.id);
+      newCard.$priority = priority;
+      newCard.$update(card);
+      card.$remove();
+      setActiveList(list);
+      setActiveCard(card);
     };
 
     hotkeys.add({
@@ -155,7 +157,7 @@ angular.module('issuesApp.controllers', [])
     hotkeys.add({
       combo: 'ctrl+h',
       description: 'Move card left',
-      callback: function() {moveCardByDelta(-1);}
+      callback: function() {moveCardToList(getActiveCard(), listByDelta(-1));}
     });
 
     hotkeys.add({
@@ -167,22 +169,20 @@ angular.module('issuesApp.controllers', [])
     hotkeys.add({
       combo: 'ctrl+l',
       description: 'Move card right',
-      callback: function() {moveCardByDelta(1);}
+      callback: function() {moveCardToList(getActiveCard(), listByDelta(1));}
     });
 
     var lists;
+    var activeList;
+    var activeCardsByList = {};
     var loadingDefer = $q.defer();
-    var repos;
-    var activeIssues;
 
     FirebaseService.then(function(firebase) {
-      $scope.currentIssues = firebase.$child("current");
-      $scope.iceboxIssues = firebase.$child("icebox");
-      $scope.backlogIssues = firebase.$child("backlog");
-      lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
+      lists = [firebase.$child("current"), firebase.$child("backlog"), firebase.$child("icebox")];
 
-      setActiveIssues();
-      updateIssues(firebase.$child('repos'));
+      $scope.lists = lists;
+      $scope.activeCard = null;
+      setActiveList();
+      // updateIssues(firebase.$child('repos'));
     });
-
 });

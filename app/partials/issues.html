@@ -1,4 +1,4 @@
-<a id='issue{{issue.id}}' ng-repeat='issue in issues | orderByPriority | filter:filter' class='list-group-item issue' ng-class='{active: issue.id==activeIssueId}'>
+<a id='issue{{issue.id}}' ng-repeat='issue in issues | orderByPriority | filter:filter' class='list-group-item issue' ng-class='{active:issue.id==activeCard.id}'>
   <h4 class='list-group-item-heading'>
     {{issue.title}}
     <small>[{{repoFromIssue(issue)}}]</small>

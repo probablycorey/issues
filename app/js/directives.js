@@ -8,7 +8,7 @@ angular.module('issuesApp.directives', [])
       scope: {
         issues: '=issues',
         filter: '=filter',
-        activeIssueId: '=activeIssueId'
+        activeCard: '=activeCard'
       },
       templateUrl: 'app/partials/issues.html',
       controller: function($scope) {
