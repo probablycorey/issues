@@ -35,7 +35,7 @@ angular.module('issuesApp.services', [])
     };
 
     var scrollToElement = function(element) {
-      if (!isElementInViewport(element)) element.scrollIntoView();
+      if (!isElementInViewport(element)) element.scrollIntoView(false);
     };
 
     return function(idString) {
