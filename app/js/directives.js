@@ -17,7 +17,7 @@ angular.module('issuesApp.directives', [])
         };
 
         $scope.repoFromIssue = function(issue) {
-          return issue.url.match(/repos\/(.*?)\/issues/)[1];
+          return issue.url.match(/repos\/(.*?)\/issues\/\d+/)[1];
         };
       }
     };

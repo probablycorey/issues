@@ -24,7 +24,7 @@ angular.module('issuesApp.controllers', [])
     };
 
     var repoNameFromUrl = function(url) {
-      return url.match(/repos\/(.*?)\/issues/)[1];
+      return url.match(/repos\/(.*?)\/issues\/\d+/)[1];
     };
 
     var refreshIssues = function(issues, repoName) {
