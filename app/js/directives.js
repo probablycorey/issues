@@ -15,6 +15,10 @@ angular.module('issuesApp.directives', [])
         $scope.assigneeImageUrl = function(assignee) {
           return assignee ? assignee.avatar_url : "https://github.global.ssl.fastly.net/images/modules/logos_page/GitHub-Mark.png";
         };
+
+        $scope.repoFromIssue = function(issue) {
+          return issue.url.match(/repos\/(.*?)\/issues/)[1];
+        };
       }
     };
   })
