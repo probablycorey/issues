@@ -3,34 +3,29 @@
 /* Controllers */
 
 angular.module('issuesApp.controllers', [])
-  .controller('IssuesCtrl', function($scope, $window, $q, $firebase, GithubService, IssueService, ScrollToElementService, hotkeys) {
-    $scope.activeIssueId = null;
-    $scope.currentIssues = IssueService.getList("current");
-    $scope.iceboxIssues = IssueService.getList("icebox");
-    $scope.backlogIssues = IssueService.getList("backlog");
-    $scope.githubIssues = null;
+  .controller('IssuesCtrl', function($scope, $window, $q, FirebaseService, GithubService, ScrollToElementService, hotkeys) {
+    var updateIssues = function (repos, keys) {
+      keys = keys ? keys : repos.$getIndex();
+      if (keys.length === 0) return;
 
-    var activeIssues = $scope.currentIssues;
-    var lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
+      var repo = repos.$child(keys.pop());
+      var elapsedMinutes = (Date.now() - repo.lastUpdated) / 1000 / 60;
+      repo.$update({lastUpdated: Date.now()});
 
-    var loadingDefer = $q.defer();
-    var loadingCount = 0;
-    var loaded = function() {
-      if (++loadingCount == 4) loadingDefer.resolve();
+      if (elapsedMinutes > 10) {
+        console.log("Updating: " + repo.name);
+        GithubService.issuesForRepo(repo.name).then(function(issues) {
+            refreshIssues(issues);
+            updateIssues(repos, keys);
+        });
+      }
+      else {
+        updateIssues(repos, keys);
+      }
     };
 
-    $scope.currentIssues.$on("loaded", loaded);
-    $scope.backlogIssues.$on("loaded", loaded);
-    $scope.iceboxIssues.$on("loaded", loaded);
-    GithubService.issues().then(function(issues) {
-      $scope.githubIssues = issues;
-      loaded();
-    });
-
-    loadingDefer.promise.then(function() {
-      setActiveIssues();
-
-      $scope.githubIssues.forEach(function(issue) {
+    var refreshIssues = function(issues) {
+      issues.forEach(function(issue) {
         var card = null;
         lists.forEach(function(list) {
           if (list[issue.id]) {
@@ -45,8 +40,8 @@ angular.module('issuesApp.controllers', [])
         card.$update(issue);
       });
 
-      setActiveIssues();
-    });
+      if (!$scope.activeIssueId) setActiveIssues();
+    };
 
     var setActiveIssues = function() {
       if ($scope.currentIssues.$getIndex().length) {
@@ -164,4 +159,19 @@ angular.module('issuesApp.controllers', [])
       description: 'Move card right',
       callback: function() {moveCardByDelta(1);}
     });
+
+    var lists;
+    var loadingDefer = $q.defer();
+    var repos;
+    var activeIssues;
+
+    FirebaseService.then(function(firebase) {
+      $scope.currentIssues = firebase.$child("current");
+      $scope.iceboxIssues = firebase.$child("icebox");
+      $scope.backlogIssues = firebase.$child("backlog");
+      lists = [$scope.currentIssues, $scope.backlogIssues, $scope.iceboxIssues];
+      setActiveIssues();
+      updateIssues(firebase.$child('repos'));
+    });
+
 });

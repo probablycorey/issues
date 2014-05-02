@@ -3,10 +3,9 @@
 angular.module('issuesApp.services', [])
   .factory('GithubService', ['$http', function($http) {
     return {
-      issues: function() {
-        return $http({method: 'GET', url: 'https://api.github.com/repos/probablycorey/issues/issues'}).
+      issuesForRepo: function(repo) {
+        return $http({method: 'GET', url: 'https://api.github.com/repos/' + repo + '/issues'}).
           catch(function(data, status, headers, config) {
-            console.log(status);
             throw new Error(data);
           }).
           then(function(data, status, headers, config) {
@@ -16,15 +15,15 @@ angular.module('issuesApp.services', [])
       }
     };
   }])
-  .factory("IssueService", ["$firebase", function($firebase) {
-    var firebase = $firebase(new Firebase("https://corey.firebaseio.com/"));
+  .factory("FirebaseService", function($firebase, $q) {
+    var deferred = $q.defer();
 
-    return {
-      getList: function(name) {
-        return firebase.$child(name);
-      }
-    };
-  }])
+    var firebase = $firebase(new Firebase("https://corey.firebaseio.com/")).$on('loaded', function() {
+      deferred.resolve(firebase);
+    });
+
+    return deferred.promise;
+  })
   .factory("ScrollToElementService", ['$window', '$document', function($window, $document) {
     var isElementInViewport = function(element) {
       var rect = element.getBoundingClientRect();
