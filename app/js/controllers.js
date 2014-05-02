@@ -35,7 +35,7 @@ angular.module('issuesApp.controllers', [])
         list.$getIndex().forEach(function(id) {
           var card = list.$child(id);
           if (repoNameFromUrl(card.url) == repoName) cards.push(card);
-          if (!_.find(issues, function(issue) {return issue.id == card.id;})) {
+          if (!_.find(issues, function(issue) {return issue.id.toString() == card.$id;})) {
             closedCards.push(card);
           }
         });
@@ -43,8 +43,8 @@ angular.module('issuesApp.controllers', [])
 
       // Update or create existing cards
       issues.forEach(function(issue) {
-        var card = _.find(cards, function(card) {return card.id == issue.id;});
-        if (!card) card = $scope.iceboxIssues.$child(issue.id);
+        var card = _.find(cards, function(card) {return card.$id == issue.id.toString();});
+        if (!card) card = $scope.iceboxIssues.$child(issue.id.toString());
         card.$update(issue);
       });
 
@@ -54,9 +54,9 @@ angular.module('issuesApp.controllers', [])
     var setActiveList = function(list) {
       if (!list) list = _.find(lists, function(list) {return list.$getIndex().length;});
       activeList = list;
-      var card = activeCardsByList[list.id];
+      var card = activeCardByList[list.$id];
       var ids = list.$getIndex();
-      if (!card || ids.indexOf(card.id) == -1) {
+      if (!card || ids.indexOf(card.$id) == -1) {
         card = list.$child(ids[0]);
       }
 
@@ -64,17 +64,17 @@ angular.module('issuesApp.controllers', [])
     };
 
     var getActiveCard = function() {
-      return activeCardsByList[activeList.id];
+      return activeCardByList[activeList.$id];
     };
 
     var setActiveCard = function(card) {
-      activeCardsByList[activeList.id] = card;
+      activeCardByList[activeList.$id] = card;
       $scope.activeCard = card;
     };
 
-    var selectIssueByDelta = function(delta) {
+    var selectActiveIssueByDelta = function(delta) {
       var ids = activeList.$getIndex();
-      var index = ids.indexOf(getActiveCard().id) + delta;
+      var index = ids.indexOf(getActiveCard().$id) + delta;
       if (index >= ids.length || index < 0) return;
 
       var card = activeList.$child(ids[index]);
@@ -84,7 +84,7 @@ angular.module('issuesApp.controllers', [])
 
     var moveActiveIssueByDelta = function(delta) {
       var ids = activeList.$getIndex();
-      var newIndex = ids.indexOf(getActiveCard().id) + delta;
+      var newIndex = ids.indexOf(getActiveCard().$id) + delta;
       if (newIndex >= ids.length || newIndex < 0) return;
 
       var activeCard = getActiveCard();
@@ -106,28 +106,39 @@ angular.module('issuesApp.controllers', [])
 
     var selectListByDelta = function(delta) {
       var list = listByDelta(delta, true);
-      setActiveList(lists);
+      setActiveList(list);
     };
 
     var moveCardToList = function(card, list) {
-      var priority = 0;
+      var priority;
       var topCardId = list.$getIndex()[0];
       if (topCardId) {
-        priority = list.$child(topCardId).$priority;
+        console.log("Top cards priority is " + list.$child(topCardId).$priority );
+        priority = list.$child(topCardId).$priority - 1;
+      }
+      else {
+        console.log("No top card");
       }
 
-      var newCard = list.$child(card.id);
+      priority = (isNaN(priority)) ? 100 : priority;
+      console.log("New priority is " + priority );
+
+      var newCard = list.$child(card.$id);
+      card.$getIndex().forEach(function(key) { newCard[key] = card[key]; });
       newCard.$priority = priority;
-      newCard.$update(card);
+      newCard.$save();
       card.$remove();
+
       setActiveList(list);
-      setActiveCard(card);
+      setActiveCard(newCard);
+
+      // list.$getIndex().forEach(function(key) { console.log(list[key].title, list[key].$priority); });
     };
 
     hotkeys.add({
       combo: 'j',
       description: 'Select down',
-      callback: function() {selectIssueByDelta(1);}
+      callback: function() {selectActiveIssueByDelta(1);}
     });
 
     hotkeys.add({
@@ -139,7 +150,7 @@ angular.module('issuesApp.controllers', [])
     hotkeys.add({
       combo: 'k',
       description: 'Select up',
-      callback: function() {selectIssueByDelta(-1);}
+      callback: function() {selectActiveIssueByDelta(-1);}
     });
 
     hotkeys.add({
@@ -174,7 +185,7 @@ angular.module('issuesApp.controllers', [])
 
     var lists;
     var activeList;
-    var activeCardsByList = {};
+    var activeCardByList = {};
     var loadingDefer = $q.defer();
 
     FirebaseService.then(function(firebase) {
