@@ -7,6 +7,7 @@ angular.module('issuesApp', [
   'ngRoute',
   'ngAnimate',
   'issuesApp.services',
+  'issuesApp.filters',
   'issuesApp.controllers',
   'issuesApp.directives'
 ]).

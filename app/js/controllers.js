@@ -74,7 +74,7 @@ angular.module('issuesApp.controllers', [])
 
     var selectActiveIssueByDelta = function(delta) {
       var ids = activeList.$getIndex();
-      var index = ids.indexOf(getActiveCard().$id) + delta;
+      var index = ids.indexOf(getActiveCard().$id) - delta; // They are sorted in reverse order
       if (index >= ids.length || index < 0) return;
 
       var card = activeList.$child(ids[index]);
@@ -84,14 +84,17 @@ angular.module('issuesApp.controllers', [])
 
     var moveActiveIssueByDelta = function(delta) {
       var ids = activeList.$getIndex();
-      var newIndex = ids.indexOf(getActiveCard().$id) + delta;
+      var newIndex = ids.indexOf(getActiveCard().$id) + delta; // They are sorted in reverse order
       if (newIndex >= ids.length || newIndex < 0) return;
 
       var activeCard = getActiveCard();
       var otherCard = activeList.$child(ids[newIndex]);
-      var tmp = activeCard.$priority;
-      activeCard.$update({priority: otherCard.$priority});
-      otherCard.$update({priority: tmp});
+
+      var tmp = activeList[activeCard.$id].$priority;
+      activeCard.$priority = activeList[otherCard.$id].$priority;
+      otherCard.$priority = tmp;
+      activeCard.$save();
+      otherCard.$save();
     };
 
     var listByDelta = function(delta, excludeEmpty) {
@@ -113,8 +116,8 @@ angular.module('issuesApp.controllers', [])
       var priority;
       var topCardId = list.$getIndex()[0];
       if (topCardId) {
-        console.log("Top cards priority is " + list.$child(topCardId).$priority );
-        priority = list.$child(topCardId).$priority - 1;
+        console.log("Top cards priority is " + list[topCardId].$priority );
+        priority = list[topCardId].$priority - 1;
       }
       else {
         console.log("No top card");
@@ -195,5 +198,21 @@ angular.module('issuesApp.controllers', [])
       $scope.activeCard = null;
       setActiveList();
       // updateIssues(firebase.$child('repos'));
+    });
+
+    hotkeys.add({
+      combo: 'p',
+      callback: function() {
+        // console.log(getActiveCard().$priority);
+        console.log(activeList[getActiveCard().$id].$priority);
+      }
+    });
+
+    hotkeys.add({
+      combo: 'P',
+      callback: function() {
+        getActiveCard().$priority = Math.round(Math.random() * 100);
+        getActiveCard().$save();
+      }
     });
 });
