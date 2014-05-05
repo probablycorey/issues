@@ -1,5 +1,5 @@
-.issue.closed {
-  background-color: red;
+.issue {
+  position: relative;
 }
 
 .issue img {
@@ -21,4 +21,12 @@
 .issue.ng-move.ng-move-active {
   opacity:1;
   -webkit-transform:scale(1.0);
+}
+
+.issue .ribbon {
+  z-index: 100;
+}
+
+.issue.active .ribbon {
+  opacity: 0.25;
 }
