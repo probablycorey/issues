@@ -84,7 +84,7 @@ angular.module('issuesApp.controllers', [])
 
     var moveActiveIssueByDelta = function(delta) {
       var ids = activeList.$getIndex();
-      var newIndex = ids.indexOf(getActiveCard().$id) + delta; // They are sorted in reverse order
+      var newIndex = ids.indexOf(getActiveCard().$id) - delta; // They are sorted in reverse order
       if (newIndex >= ids.length || newIndex < 0) return;
 
       var activeCard = getActiveCard();
