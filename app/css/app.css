@@ -8,6 +8,10 @@
   width: 10%;
 }
 
+.issue.closed {
+  background-color: red;
+}
+
 .issue.ng-move {
   -webkit-transition:0.2s linear all;
   opacity:0.5;

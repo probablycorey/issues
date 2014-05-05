@@ -36,6 +36,7 @@ angular.module('issuesApp.controllers', [])
           var card = list.$child(id);
           if (repoNameFromUrl(card.url) == repoName) cards.push(card);
           if (!_.find(issues, function(issue) {return issue.id.toString() == card.$id;})) {
+            card.$update({state: 'closed'});
             closedCards.push(card);
           }
         });
@@ -44,20 +45,24 @@ angular.module('issuesApp.controllers', [])
       // Update or create existing cards
       issues.forEach(function(issue) {
         var card = _.find(cards, function(card) {return card.$id == issue.id.toString();});
-        if (!card) card = $scope.iceboxIssues.$child(issue.id.toString());
+        if (!card) card = icebox.$child(issue.id.toString());
         card.$update(issue);
       });
 
       console.log("Closed cards", closedCards);
+
+      if (!activeList) setActiveList();
     };
 
     var setActiveList = function(list) {
       if (!list) list = _.find(lists, function(list) {return list.$getIndex().length;});
+      if (!list) return;
+
       activeList = list;
       var card = activeCardByList[list.$id];
       var ids = list.$getIndex();
       if (!card || ids.indexOf(card.$id) == -1) {
-        card = list.$child(ids[0]);
+        card = list.$child(_.last(ids));
       }
 
       setActiveCard(card);
@@ -188,16 +193,18 @@ angular.module('issuesApp.controllers', [])
 
     var lists;
     var activeList;
+    var icebox;
     var activeCardByList = {};
     var loadingDefer = $q.defer();
 
     FirebaseService.then(function(firebase) {
-      lists = [firebase.$child("current"), firebase.$child("backlog"), firebase.$child("icebox")];
+      icebox = firebase.$child("icebox");
+      lists = [firebase.$child("current"), firebase.$child("backlog"), icebox];
 
       $scope.lists = lists;
       $scope.activeCard = null;
       setActiveList();
-      // updateIssues(firebase.$child('repos'));
+      updateIssues(firebase.$child('repos'));
     });
 
     hotkeys.add({
