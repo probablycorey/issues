@@ -117,13 +117,13 @@ angular.module('issuesApp.controllers', [])
       var topCardId = list.$getIndex()[0];
       if (topCardId) {
         console.log("Top cards priority is " + list[topCardId].$priority );
-        priority = list[topCardId].$priority - 1;
+        priority = list[topCardId].$priority;
       }
       else {
         console.log("No top card");
       }
 
-      priority = (isNaN(priority)) ? 100 : priority;
+      priority = (isNaN(priority)) ? 100 : priority + 1;
       console.log("New priority is " + priority );
 
       var newCard = list.$child(card.$id);
