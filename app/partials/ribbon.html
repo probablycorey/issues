@@ -1,0 +1,8 @@
+<div ng-if="isClosed(issue) || isNew(issue)" class="ribbon ribbon-small" ng-class='{"ribbon-red":isClosed(issue), "ribbon-green":isNew(issue)}'>
+  <div class="banner">
+      <div class="text">
+        <span ng-if="isClosed(issue)">closed</span>
+        <span ng-if="isNew(issue)">new</span>
+      </div>
+  </div>
+</div>

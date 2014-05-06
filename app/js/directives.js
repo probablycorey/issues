@@ -22,6 +22,27 @@ angular.module('issuesApp.directives', [])
       }
     };
   })
+  .directive('ribbon', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        issue: '=issue',
+      },
+      templateUrl: 'app/partials/ribbon.html',
+      controller: function($scope) {
+        $scope.isNew = function(issue) {
+          var createdAt = new Date(issue.created_at);
+          var delta = new Date() - createdAt;
+          var hours = delta / 1000 / 60 / 60;
+          return hours < 24;
+        };
+
+        $scope.isClosed = function(issue) {
+          return issue.state == 'closed';
+        };
+      }
+    };
+  })
   .directive('escapable', function() {
     var escapeKey = 27;
     return function(scope, element, attrs) {

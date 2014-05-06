@@ -49,8 +49,6 @@ angular.module('issuesApp.controllers', [])
         card.$update(issue);
       });
 
-      console.log("Closed cards", closedCards);
-
       if (!activeList) setActiveList();
     };
 
