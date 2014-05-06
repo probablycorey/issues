@@ -118,6 +118,7 @@ angular.module('issuesApp.controllers', [])
     };
 
     var moveCardToList = function(card, list) {
+      if (activeList == list) return;
       var priority;
       var topCardId = list.$getIndex()[0];
       if (topCardId) {
