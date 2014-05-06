@@ -120,7 +120,7 @@ angular.module('issuesApp.controllers', [])
     var moveCardToList = function(card, list) {
       if (activeList == list) return;
       var priority;
-      var topCardId = list.$getIndex()[0];
+      var topCardId = _.last(list.$getIndex());
       if (topCardId) {
         console.log("Top cards priority is " + list[topCardId].$priority );
         priority = list[topCardId].$priority;
