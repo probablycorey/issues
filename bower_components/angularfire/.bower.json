@@ -1,5 +1,6 @@
 {
   "name": "angularfire",
+  "version": "0.7.1",
   "main": [
     "./angularfire.js"
   ],
@@ -20,13 +21,13 @@
     "observe-js": "~0.1.4"
   },
   "homepage": "https://github.com/firebase/angularFire",
-  "_release": "9d13ed9833",
+  "_release": "0.7.1",
   "_resolution": {
-    "type": "branch",
-    "branch": "master",
-    "commit": "9d13ed98335f43ce80969f18ef06c0d3a89d73c1"
+    "type": "version",
+    "tag": "v0.7.1",
+    "commit": "9a8b767364778d83e5c0fd9984c528066d2fe89c"
   },
   "_source": "git@github.com:firebase/angularFire.git",
-  "_target": "master",
+  "_target": "*",
   "_originalSource": "git@github.com:firebase/angularFire.git"
 }
