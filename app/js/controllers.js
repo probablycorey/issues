@@ -13,7 +13,7 @@ angular.module('issuesApp.controllers', [])
 
       if (elapsedMinutes > 10) {
         repo.$update({lastUpdated: Date.now()});
-        GithubService.issuesForRepo(repo.name, $scope.user.token).then(function(issues) {
+        GithubService.issuesForRepo(repo.name, $scope.user.accessToken).then(function(issues) {
             refreshIssues(issues, repo.name);
             updateIssues(repos, keys);
         });
@@ -212,8 +212,8 @@ angular.module('issuesApp.controllers', [])
     FirebaseService.then(function(results) {
       var firebase = results.firebase;
       var user = results.user;
-      laterList = firebase.$child("laterList");
-      lists = [firebase.$child("nowList"), firebase.$child("nextlist"), laterList];
+      laterList = firebase.$child("later");
+      lists = [firebase.$child("now"), firebase.$child("next"), laterList];
 
       $scope.lists = lists;
       $scope.user = user;

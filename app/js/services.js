@@ -6,10 +6,12 @@ angular.module('issuesApp.services', [])
   .factory('GithubService', ['$http', function($http) {
     return {
       issuesForRepo: function(repo, token) {
-        var config = {headers: ["Authorization: token " + token]};
+        var config = {headers: {'Authorization': 'token ' + token}};
 
         return $http.get('https://api.github.com/repos/' + repo + '/issues', config)
           .catch(function(data, status, headers, config) {
+            console.error(data);
+            console.error(status);
             throw new Error(data);
           })
           .then(function(data, status, headers, config) {
@@ -22,7 +24,7 @@ angular.module('issuesApp.services', [])
   .factory("FirebaseService", function($firebase, $firebaseSimpleLogin, $q) {
     var deferred = $q.defer();
     var firebase = new Firebase(FIREBASE_URL);
-    var oauthOptions = {rememberMe: true, scope: 'user,gist'};
+    var oauthOptions = {rememberMe: true, scope: 'user,gist,repo'};
 
     var fb = $firebase(firebase);
     fb.$on('loaded', function() {

@@ -7,6 +7,7 @@ angular.module('issuesApp.directives', [])
       restrict: 'E',
       scope: {
         issues: '=issues',
+        user: '=user',
         filter: '=filter',
         activeCard: '=activeCard'
       },
@@ -26,23 +27,32 @@ angular.module('issuesApp.directives', [])
     return {
       restrict: 'E',
       scope: {
+        user: '=user',
         issue: '=issue',
       },
       templateUrl: 'app/partials/ribbon.html',
       controller: function($scope) {
-        $scope.isNew = function(issue) {
-          var createdAt = new Date(issue.created_at);
+        $scope.isNew = function() {
+          var createdAt = new Date($scope.issue.created_at);
           var delta = new Date() - createdAt;
           var hours = delta / 1000 / 60 / 60;
           return hours < 24;
         };
 
-        $scope.isUnhandled = function(issue) {
-          return !issue.handled && !issue.assignee;
+        $scope.isUnhandled = function() {
+          if ($scope.issue.handled) {
+            return false;
+          }
+          else if ($scope.issue.assignee) {
+            return $scope.issue.assignee.login == $scope.user.username;
+          }
+          else {
+            return true;
+          }
         };
 
-        $scope.isClosed = function(issue) {
-          return issue.state == 'closed';
+        $scope.isClosed = function() {
+          return $scope.issue.state == 'closed';
         };
       }
     };
