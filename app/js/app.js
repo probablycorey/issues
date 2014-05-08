@@ -12,7 +12,6 @@ angular.module('issuesApp', [
   'issuesApp.directives'
 ]).
 config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
-  $locationProvider.html5Mode(true);
   $routeProvider.when('/issues', {templateUrl: 'app/partials/dashboard.html', controller: 'IssuesCtrl'});
   $routeProvider.otherwise({redirectTo: '/issues'});
 }]);
