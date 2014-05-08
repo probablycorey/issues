@@ -45,8 +45,22 @@ angular.module('issuesApp.controllers', [])
       // Update or create existing cards
       issues.forEach(function(issue) {
         var card = _.find(cards, function(card) {return card.$id == issue.id.toString();});
-        if (!card) card = laterList.$child(issue.id.toString());
-        card.$update(issue);
+        if (!card) {
+          card = laterList.$child(issue.id.toString());
+          var priority = 100;
+          var lowestPriorityCardId = laterList.$getIndex()[0];
+          if (lowestPriorityCardId) {
+            var lowestPriorityCard = laterList[lowestPriorityCardId];
+            priority = lowestPriorityCard.$priority - 1;
+          }
+
+          card.$update(issue);
+          card.$priority = priority;
+          card.$save();
+        }
+        else {
+          card.$update(issue);
+        }
       });
 
       if (!activeList) setActiveList();
