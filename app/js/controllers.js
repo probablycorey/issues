@@ -197,6 +197,12 @@ angular.module('issuesApp.controllers', [])
       callback: function() {moveCardToList(getActiveCard(), listByDelta(1));}
     });
 
+    hotkeys.add({
+      combo: 'e',
+      description: 'Toggle handled state',
+      callback: function() {getActiveCard().$update({handled: !getActiveCard().handled});}
+    });
+
     var lists;
     var activeList;
     var laterList;

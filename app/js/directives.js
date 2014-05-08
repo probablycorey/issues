@@ -37,6 +37,10 @@ angular.module('issuesApp.directives', [])
           return hours < 24;
         };
 
+        $scope.isUnhandled = function(issue) {
+          return !issue.handled && !issue.assignee;
+        };
+
         $scope.isClosed = function(issue) {
           return issue.state == 'closed';
         };
