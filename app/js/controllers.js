@@ -13,7 +13,7 @@ angular.module('issuesApp.controllers', [])
 
       if (elapsedMinutes > 10) {
         repo.$update({lastUpdated: Date.now()});
-        GithubService.issuesForRepo(repo.name).then(function(issues) {
+        GithubService.issuesForRepo(repo.name, $scope.user.token).then(function(issues) {
             refreshIssues(issues, repo.name);
             updateIssues(repos, keys);
         });
@@ -209,11 +209,14 @@ angular.module('issuesApp.controllers', [])
     var activeCardByList = {};
     var loadingDefer = $q.defer();
 
-    FirebaseService.then(function(firebase) {
+    FirebaseService.then(function(results) {
+      var firebase = results.firebase;
+      var user = results.user;
       laterList = firebase.$child("laterList");
       lists = [firebase.$child("nowList"), firebase.$child("nextlist"), laterList];
 
       $scope.lists = lists;
+      $scope.user = user;
       $scope.activeCard = null;
       setActiveList();
       updateIssues(firebase.$child('repos'));

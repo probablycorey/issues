@@ -15,6 +15,7 @@
     "angular-hotkeys": "git@github.com:chieffancypants/angular-hotkeys.git",
     "bootstrap": "~3.1.1",
     "firebase": "~1.0.11",
+    "firebase-simple-login": "~1.4.1",
     "marked": "~0.3.2",
     "underscore": "~1.6.0"
   }

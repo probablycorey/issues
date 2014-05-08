@@ -1,25 +1,34 @@
 'use strict';
 
+var FIREBASE_URL="https://corey.firebaseio.com/";
+
 angular.module('issuesApp.services', [])
   .factory('GithubService', ['$http', function($http) {
     return {
-      issuesForRepo: function(repo) {
-        return $http({method: 'GET', url: 'https://api.github.com/repos/' + repo + '/issues'}).
-          catch(function(data, status, headers, config) {
+      issuesForRepo: function(repo, token) {
+        var config = {headers: ["Authorization: token " + token]};
+
+        return $http.get('https://api.github.com/repos/' + repo + '/issues', config)
+          .catch(function(data, status, headers, config) {
             throw new Error(data);
-          }).
-          then(function(data, status, headers, config) {
+          })
+          .then(function(data, status, headers, config) {
             var issues = data.data;
             return issues;
           });
       }
     };
   }])
-  .factory("FirebaseService", function($firebase, $q) {
+  .factory("FirebaseService", function($firebase, $firebaseSimpleLogin, $q) {
     var deferred = $q.defer();
+    var firebase = new Firebase(FIREBASE_URL);
+    var oauthOptions = {rememberMe: true, scope: 'user,gist'};
 
-    var firebase = $firebase(new Firebase("https://corey.firebaseio.com/")).$on('loaded', function() {
-      deferred.resolve(firebase);
+    var fb = $firebase(firebase);
+    fb.$on('loaded', function() {
+      $firebaseSimpleLogin(firebase).$login('github', oauthOptions).then(function(user) {
+        deferred.resolve({firebase:fb, user:user});
+      });
     });
 
     return deferred.promise;
