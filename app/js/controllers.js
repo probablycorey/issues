@@ -45,7 +45,7 @@ angular.module('issuesApp.controllers', [])
       // Update or create existing cards
       issues.forEach(function(issue) {
         var card = _.find(cards, function(card) {return card.$id == issue.id.toString();});
-        if (!card) card = icebox.$child(issue.id.toString());
+        if (!card) card = laterList.$child(issue.id.toString());
         card.$update(issue);
       });
 
@@ -185,13 +185,13 @@ angular.module('issuesApp.controllers', [])
 
     var lists;
     var activeList;
-    var icebox;
+    var laterList;
     var activeCardByList = {};
     var loadingDefer = $q.defer();
 
     FirebaseService.then(function(firebase) {
-      icebox = firebase.$child("icebox");
-      lists = [firebase.$child("current"), firebase.$child("backlog"), icebox];
+      laterList = firebase.$child("laterList");
+      lists = [firebase.$child("nowList"), firebase.$child("nextlist"), laterList];
 
       $scope.lists = lists;
       $scope.activeCard = null;
