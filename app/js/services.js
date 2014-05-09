@@ -45,7 +45,6 @@ angular.module('issuesApp.services', [])
     var deferred = $q.defer();
     var firebase = new Firebase(FIREBASE_URL);
     var oauthOptions = {rememberMe: true, scope: 'user,gist,repo'};
-    // var user = {accessToken:"wow"};
 
     var fb = $firebase(firebase);
     fb.$on('loaded', function() {
