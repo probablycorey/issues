@@ -202,7 +202,9 @@ angular.module('issuesApp.controllers', [])
       description: 'Toggle handled state',
       callback: function() {
         if (getActiveCard().assignee.login != $scope.user.username) return;
-        getActiveCard().$update({handled: !getActiveCard().handled});
+
+        if (getActiveCard().handled) getActiveCard().$update({handled: $scope.user.username});
+        else getActiveCard().$update({handled: null});
       }
     });
 
