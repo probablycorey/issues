@@ -3,28 +3,49 @@
 var FIREBASE_URL="https://corey.firebaseio.com/";
 
 angular.module('issuesApp.services', [])
-  .factory('GithubService', ['$http', function($http) {
-    return {
-      issuesForRepo: function(repo, token) {
-        var config = {headers: {'Authorization': 'token ' + token}};
-
-        return $http.get('https://api.github.com/repos/' + repo + '/issues', config)
-          .catch(function(data, status, headers, config) {
-            console.error(data);
-            console.error(status);
-            throw new Error(data);
-          })
-          .then(function(data, status, headers, config) {
-            var issues = data.data;
-            return issues;
-          });
-      }
+  .service('GithubService', function($http, $q) {
+    this.setToken = function(token) {
+      this.token = token;
     };
-  }])
+
+    this.getConfig = function() {
+      return {headers: {'Authorization': 'token ' + this.token}};
+    };
+
+    this.issuesForRepo = function(repo) {
+      return this.get('https://api.github.com/repos/' + repo + '/issues');
+    };
+
+    this.get = function(url) {
+      var deferred = $q.defer();
+      var results = [];
+      var self = this;
+      $http.get(url, this.getConfig())
+        .catch(function(response) {
+          console.error(response);
+          deferred.reject(response.data);
+        })
+        .then(function(response) {
+          results = results.concat(response.data);
+          var match = response.headers('link').match(/<(.*?)>; rel="next"/);
+          if (!match) {
+            deferred.resolve(results);
+          }
+          else {
+            self.get(match[1]).then(function(moreResults) {
+              deferred.resolve(results.concat(moreResults));
+            });
+          }
+        });
+
+        return deferred.promise;
+    };
+  })
   .factory("FirebaseService", function($firebase, $firebaseSimpleLogin, $q) {
     var deferred = $q.defer();
     var firebase = new Firebase(FIREBASE_URL);
     var oauthOptions = {rememberMe: true, scope: 'user,gist,repo'};
+    // var user = {accessToken:"wow"};
 
     var fb = $firebase(firebase);
     fb.$on('loaded', function() {
