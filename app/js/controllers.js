@@ -201,6 +201,10 @@ angular.module('issuesApp.controllers', [])
       combo: 'e',
       description: 'Toggle handled state',
       callback: function() {getActiveCard().$update({handled: !getActiveCard().handled});}
+    hotkeys.add({
+      combo: 'o',
+      description: 'Open issue',
+      callback: function() {$window.open(getActiveCard().html_url, "_blank");}
     });
 
     var lists;
