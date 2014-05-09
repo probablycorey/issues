@@ -12,8 +12,12 @@ angular.module('issuesApp.services', [])
       return {headers: {'Authorization': 'token ' + this.token}};
     };
 
-    this.issuesForRepo = function(repo) {
-      return this.get('https://api.github.com/repos/' + repo + '/issues');
+    this.issuesForRepo = function(repoName) {
+      return this.get('https://api.github.com/repos/' + repoName + '/issues');
+    };
+
+    this.reposForOrg = function(orgName) {
+      return this.get('https://api.github.com/orgs/' + orgName + '/repos');
     };
 
     this.get = function(url) {
@@ -27,7 +31,7 @@ angular.module('issuesApp.services', [])
         })
         .then(function(response) {
           results = results.concat(response.data);
-          var match = response.headers('link').match(/<(.*?)>; rel="next"/);
+          var match = (response.headers('link') || "").match(/<(.*?)>; rel="next"/);
           if (!match) {
             deferred.resolve(results);
           }
@@ -45,12 +49,23 @@ angular.module('issuesApp.services', [])
     var deferred = $q.defer();
     var firebase = new Firebase(FIREBASE_URL);
     var oauthOptions = {rememberMe: true, scope: 'user,gist,repo'};
+    var user = null;
+
+    if (localStorage.getItem('user')) {
+      user = JSON.parse(localStorage.getItem('user'));
+    }
 
     var fb = $firebase(firebase);
     fb.$on('loaded', function() {
-      $firebaseSimpleLogin(firebase).$login('github', oauthOptions).then(function(user) {
+      if (user) {
         deferred.resolve({firebase:fb, user:user});
-      });
+      }
+      else {
+        $firebaseSimpleLogin(firebase).$login('github', oauthOptions).then(function(user) {
+          localStorage.setItem('user', JSON.stringify(user));
+          deferred.resolve({firebase:fb, user:user});
+        });
+      }
     });
 
     return deferred.promise;

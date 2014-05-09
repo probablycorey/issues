@@ -4,37 +4,56 @@
 
 angular.module('issuesApp.controllers', [])
   .controller('IssuesCtrl', function($scope, $window, $q, _, FirebaseService, GithubService, ScrollToElementService, hotkeys) {
-    var updateIssues = function (repos, keys) {
-      keys = keys ? keys : repos.$getIndex();
-      if (keys.length === 0) return;
+    var updateRepos = function() {
+      firebase['repos'] = firebase['repos'] ? firebase['repos'] : [];
+      var existingRepos = firebase['repos'];
+      return GithubService.reposForOrg('atom').then(function(repos) {
+        repos.forEach(function(repo) {
+          var nameWithOrg = "atom/" + repo.name;
+          var exists = _.find(existingRepos, function(object) {return object.nameWithOrg == nameWithOrg;});
+          if (!exists) {
+            existingRepos.push({nameWithOrg:nameWithOrg, lastUpdatedAt:0});
+          }
+        });
+        return firebase.$save().then(function() {return existingRepos;});
+      });
+    };
 
-      var repo = repos.$child(keys.pop());
-      var elapsedMinutes = (Date.now() - repo.lastUpdated) / 1000 / 60;
+    var updateIssues = function (repos) {
+      if (repos.length === 0) return;
+
+      var repo = repos[0];
+      repos = repos.slice(1);
+
+      var elapsedMinutes = (Date.now() - repo.lastUpdatedAt) / 1000 / 60;
 
       if (elapsedMinutes > 10) {
-        repo.$update({lastUpdated: Date.now()});
-        GithubService.issuesForRepo(repo.name).then(function(issues) {
-            refreshIssues(issues, repo.name);
-            updateIssues(repos, keys);
+        repo.lastUpdatedAt = Date.now();
+        firebase.$save();
+        $scope.status = "Updating " + repo.nameWithOrg;
+        GithubService.issuesForRepo(repo.nameWithOrg).then(function(issues) {
+            refreshIssues(issues, repo.nameWithOrg);
+            updateIssues(repos);
         });
       }
       else {
-        updateIssues(repos, keys);
+        $scope.status = repo.nameWithOrg + " doesn't need updating.";
+        updateIssues(repos);
       }
     };
 
-    var repoNameFromUrl = function(url) {
+    var nameWithOrgFromUrl = function(url) {
       return url.match(/repos\/(.*?)\/issues\/\d+/)[1];
     };
 
-    var refreshIssues = function(issues, repoName) {
+    var refreshIssues = function(issues, nameWithOrg) {
       // Get all existing cards for repo
       var cards = [];
       var closedCards = [];
       lists.forEach(function(list) {
         list.$getIndex().forEach(function(id) {
           var card = list.$child(id);
-          if (repoNameFromUrl(card.url) == repoName) cards.push(card);
+          if (nameWithOrgFromUrl(card.url) == nameWithOrg) cards.push(card);
           if (!_.find(issues, function(issue) {return issue.id.toString() == card.$id;})) {
             card.$update({state: 'closed'});
             closedCards.push(card);
@@ -217,12 +236,13 @@ angular.module('issuesApp.controllers', [])
     var lists;
     var activeList;
     var laterList;
+    var firebase;
     var activeCardByList = {};
     var loadingDefer = $q.defer();
 
     FirebaseService.then(function(results) {
-      var firebase = results.firebase;
       var user = results.user;
+      firebase = results.firebase;
       laterList = firebase.$child("later");
       lists = [firebase.$child("now"), firebase.$child("next"), laterList];
 
@@ -232,6 +252,10 @@ angular.module('issuesApp.controllers', [])
       $scope.user = user;
       $scope.activeCard = null;
       setActiveList();
-      updateIssues(firebase.$child('repos'));
+
+      $scope.status = "Checking for new repos";
+      updateRepos().then(function(repos) {
+        updateIssues(repos);
+      });
     });
 });
