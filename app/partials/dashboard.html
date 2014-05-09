@@ -1,16 +1,24 @@
-{{user.username}}
-
-<p class="row">
-  <div class="col">
-    <div class="input-group">
-      <input escapable ng-model="filter" type="text" class="form-control" placeholder="filter">
+<div  class="container-fluid"></div>
+  <p class="row">
+    <div class="col">
+      <div class="input-group">
+        <input escapable ng-model="filter" type="text" class="form-control" placeholder="filter">
+      </div>
     </div>
-  </div>
-</p>
+  </p>
 
-<p class="row">
-  <div ng-repeat="list in lists" class="list-group col-md-4">
-    <h3>{{list.$id}} <span class="label label-default">{{list.$getIndex().length}}</span></h3>
-    <issues issues='list' filter='filter' active-card='activeCard' user='user'></issues>
-  </div>
-</p>
+  <p class="row">
+    <div ng-repeat="list in lists" class="list-group col-md-4">
+      <h3>{{list.$id}} <span class="label label-default">{{list.$getIndex().length}}</span></h3>
+      <issues issues='list' filter='filter' active-card='activeCard' user='user'></issues>
+    </div>
+  </p>
+</div>
+
+<div id="footer">
+  <p class="row">
+    <div class="col-md-12">
+      <p class="text-muted">{{status}}</p>
+    </div>
+  </p>
+</div>
