@@ -9,7 +9,7 @@
 </p>
 
 <p class="row">
-  <div ng-repeat="list in lists" class="list-group col-md-3">
+  <div ng-repeat="list in lists" class="list-group col-md-4">
     <h3>{{list.$id}} <span class="label label-default">{{list.$getIndex().length}}</span></h3>
     <issues issues='list' filter='filter' active-card='activeCard' user='user'></issues>
   </div>
