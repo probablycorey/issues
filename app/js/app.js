@@ -4,6 +4,7 @@
 angular.module('issuesApp', [
   'cfp.hotkeys',
   'firebase',
+  'ui.bootstrap',
   'ngRoute',
   'ngAnimate',
   'issuesApp.services',

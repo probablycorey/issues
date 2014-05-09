@@ -3,7 +3,9 @@
 /* Controllers */
 
 angular.module('issuesApp.controllers', [])
-  .controller('IssuesCtrl', function($scope, $window, $q, _, FirebaseService, GithubService, ScrollToElementService, hotkeys) {
+  .controller('ModalCtrl', function ($scope) {
+  })
+  .controller('IssuesCtrl', function($scope, $window, $q, $modal, _, FirebaseService, GithubService, ScrollToElementService, hotkeys) {
     var updateIssues = function (repos, keys) {
       keys = keys ? keys : repos.$getIndex();
       if (keys.length === 0) return;
@@ -209,7 +211,16 @@ angular.module('issuesApp.controllers', [])
     hotkeys.add({
       combo: 'o',
       description: 'Open issue',
-      callback: function() {$window.open(getActiveCard().html_url, "_blank");}
+      callback: function() {
+        var modalInstance = $modal.open({
+          templateUrl: 'app/partials/card-modal.html',
+          size: 'lg',
+          // scope: {
+          //   name: 'bob'
+          // }
+        });
+        // $window.open(getActiveCard().html_url, "_blank");
+      }
     });
 
     var lists;
