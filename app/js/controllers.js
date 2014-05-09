@@ -200,7 +200,12 @@ angular.module('issuesApp.controllers', [])
     hotkeys.add({
       combo: 'e',
       description: 'Toggle handled state',
-      callback: function() {getActiveCard().$update({handled: !getActiveCard().handled});}
+      callback: function() {
+        if (getActiveCard().assignee.login != $scope.user.username) return;
+        getActiveCard().$update({handled: !getActiveCard().handled});
+      }
+    });
+
     hotkeys.add({
       combo: 'o',
       description: 'Open issue',
