@@ -223,19 +223,4 @@ angular.module('issuesApp.controllers', [])
       setActiveList();
       updateIssues(firebase.$child('repos'));
     });
-
-    hotkeys.add({
-      combo: 'p',
-      callback: function() {
-        console.log(activeList[getActiveCard().$id].$priority);
-      }
-    });
-
-    hotkeys.add({
-      combo: 'P',
-      callback: function() {
-        getActiveCard().$priority = Math.round(Math.random() * 100);
-        getActiveCard().$save();
-      }
-    });
 });
